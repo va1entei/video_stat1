@@ -26,4 +26,5 @@ jobs:
            sudo apt-get install python-requests          
            sudo pip3 install imutils
            sudo pip3 install streamlink
+           sudo pip3 install Pillow
            ${{github.event.comment.body}} 
