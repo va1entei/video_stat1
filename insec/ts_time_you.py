@@ -158,7 +158,7 @@ if __name__ == "__main__":
             writer.writerow({'data': '20200101', 'time_start': '010101',
                 'time_stop':'010101','count_move':'0',
                 'screen':'none' })
-                
+    print("read csv")            
     df = pd.read_csv(file_csv)
     datanow = df['data'].tolist()
     datanum = datanow[-1]
@@ -167,7 +167,8 @@ if __name__ == "__main__":
     tzloc = pytz.timezone('Europe/Tallinn')
     
     for i in segments:
-        timeinurl = int(i.split('/mt/')[1].split('/sparams/')[0])
+        timeinurl = i.split('/mt/')[1].split('/sparams/')[0]
+        print(timeinurl)
         valuetmp = datetime.datetime.fromtimestamp(int(timeinurl),tzloc)      
         if int(datanum) > int(valuetmp.strftime('%Y%m%d')):
             continue
