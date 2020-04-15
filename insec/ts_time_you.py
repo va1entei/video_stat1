@@ -15,8 +15,6 @@ TIME_LIM = 900
 DEF_AREA = 500
 REFERER = ""
 
-OUTNAME = 'video_'  # default output file name
-LOC = ""  # default save location
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0",
@@ -173,9 +171,9 @@ if __name__ == "__main__":
     timenow = df['time_stop'].tolist()
     timenum = timenow[-1]  
     tzloc = pytz.timezone('Europe/Tallinn')
-    timeinurl = timestamp - timeadd
+    timeinurl = timestamp - int(timeadd)
     for i in segments:
-        timeinurl += timeadd
+        timeinurl += int(timeadd)
         valuetmp = datetime.datetime.fromtimestamp(timeinurl,tzloc)      
         if int(datanum) > int(valuetmp.strftime('%Y%m%d')):
             continue
