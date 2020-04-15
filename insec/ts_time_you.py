@@ -147,7 +147,7 @@ if __name__ == "__main__":
 #EXT-X-PROGRAM-DATE-TIME:2020-04-15T09:35:14.388+00:00
 #EXT-X-TARGETDURATION:5
     datime = m3u8.text.split('EXT-X-PROGRAM-DATE-TIME:')[1].split('.')[0]    
-    timeadd = m3u8.text.split('EXT-X-TARGETDURATION:')[1].split('.')[0]        
+    timeadd = m3u8.text.split('EXT-X-TARGETDURATION:')[1].split('\n#')[0]        
     date = datetime.datetime.strptime(datime, "%Y-%m-%dT%H:%M:%S")
     timestamp = datetime.datetime.timestamp(date)
 
