@@ -146,6 +146,14 @@ if __name__ == "__main__":
     m3u8 = requests.get(video_url+"?start_seq=0", headers=HEADERS)
     segments = getSegs(m3u8)
 
+#EXT-X-PROGRAM-DATE-TIME:2020-04-15T09:35:14.388+00:00
+#EXT-X-TARGETDURATION:5
+    datime = m3u8.text.split('EXT-X-PROGRAM-DATE-TIME:')[1].split('.')[0]    
+    timeadd = m3u8.text.split('EXT-X-TARGETDURATION:')[1].split('.')[0]        
+    date = datetime.datetime.strptime(datime, "%Y-%m-%dT%H:%M:%S")
+    timestamp = datetime.datetime.timestamp(date)
+
+
     aa = []
     bb = []
     print("csv")
@@ -165,18 +173,17 @@ if __name__ == "__main__":
     timenow = df['time_stop'].tolist()
     timenum = timenow[-1]  
     tzloc = pytz.timezone('Europe/Tallinn')
-    
+    timeinurl = timestamp - timeadd
     for i in segments:
-        timeinurl = i.split('/mt/')[1].split('/sparams/')[0]
-        print(timeinurl)
-        valuetmp = datetime.datetime.fromtimestamp(int(timeinurl),tzloc)      
+        timeinurl += timeadd
+        valuetmp = datetime.datetime.fromtimestamp(timeinurl,tzloc)      
         if int(datanum) > int(valuetmp.strftime('%Y%m%d')):
             continue
         if int(datanum) == int(valuetmp.strftime('%Y%m%d')):
             if int(timenum) > int(valuetmp.strftime('%H%M%S')):
                 continue
                 
-        aa.append(int(timeinurl))
+        aa.append(timeinurl)
         bb.append(i)
         if aa[-1] - aa[0] > TIME_LIM:
             print(bb)
