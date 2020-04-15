@@ -187,7 +187,7 @@ if __name__ == "__main__":
                 
         aa.append(timeinurl)
         bb.append(i)
-        print(aa)
+#        print(aa)
         print(aa[-1] - aa[0])
         if aa[-1] - aa[0] > TIME_LIM:
             print(bb)
@@ -204,15 +204,15 @@ if __name__ == "__main__":
                     'time_stop':value2.strftime('%H%M%S'),'count_move':out,
                     'screen':'none' if out == 0 else file_video_name.split('.')[0]+".jpg"})
 
-            if out > 2:
-                folder1 = path_to_in+file_video_name.split('-')[0]
-                folder1 = folder1+"/"+file_video_name.split('-')[1]+"-"+file_video_name.split('-')[2].split('.')[0]
-                fp_in = folder1+"/"+"*.jpg"
-                fp_out = folder1+"/"+file_video_name.split('.')[0]+".gif"
-                img, *imgs = [Image.open(f) for f in sorted(glob.glob(fp_in))]
-                img.save(fp=fp_out, format='GIF', append_images=imgs,
-                        save_all=True, duration=200, loop=0)
-                os.system("rm -rf "+folder1+"/"+"*.jpg")
+#            if out > 2:
+#                folder1 = path_to_in+file_video_name.split('-')[0]
+#                folder1 = folder1+"/"+file_video_name.split('-')[1]+"-"+file_video_name.split('-')[2].split('.')[0]
+#                fp_in = folder1+"/"+"*.jpg"
+#                fp_out = folder1+"/"+file_video_name.split('.')[0]+".gif"
+#                img, *imgs = [Image.open(f) for f in sorted(glob.glob(fp_in))]
+#                img.save(fp=fp_out, format='GIF', append_images=imgs,
+#                        save_all=True, duration=200, loop=0)
+#                os.system("rm -rf "+folder1+"/"+"*.jpg")
                 
             os.remove(file_video_name)
 
