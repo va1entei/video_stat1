@@ -142,7 +142,7 @@ def dumpSegs( segments, path, append=False):
 if __name__ == "__main__":
     print("start")
     streams = streamlink.streams(video_url)
-    video_url = streams["best"].video_url
+    video_url = streams["best"].url
     m3u8 = requests.get(video_url+"?start_seq=0", headers=HEADERS)
     segments = getSegs(m3u8)
 
