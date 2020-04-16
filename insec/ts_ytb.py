@@ -184,12 +184,12 @@ if __name__ == "__main__":
     datanum = datanow[-1]
     timenow = df['time_stop'].tolist()
     timenum = timenow[-1]  
-#    tzloc = pytz.timezone('Europe/Tallinn')
+    tzloc = pytz.timezone('Europe/Tallinn')
     timeinurl = timestamp - int(timeadd)
     timesave = 0
     for i in segments:
         timeinurl += int(timeadd)
-        valuetmp = datetime.datetime.fromtimestamp(timeinurl)      
+        valuetmp = datetime.datetime.fromtimestamp(timeinurl,tzloc)      
         print(valuetmp.strftime('%Y%m%d-%H%M%S'))
         if int(datanum) > int(valuetmp.strftime('%Y%m%d')):
             continue
@@ -205,8 +205,6 @@ if __name__ == "__main__":
         value2 = datetime.datetime.fromtimestamp(aa[-1],tzloc)
         if aa[-1] - aa[0] > TIME_LIM or value.strftime('%Y%m%d') != value2.strftime('%Y%m%d'):        
             print(bb)
-            value = datetime.datetime.fromtimestamp(aa[0])
-            value2 = datetime.datetime.fromtimestamp(aa[-1])
             file_video_name = value.strftime('%Y%m%d-%H%M%S')+value2.strftime('-%H%M%S')+".ts"
             dumpSegs( bb,file_video_name )
             out = detect_motion(file_video_name)
