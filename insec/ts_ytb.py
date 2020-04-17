@@ -12,6 +12,7 @@ import pytz
 import streamlink
 import glob
 from PIL import Image
+import shutil
 
 TIME_LIM = 600
 DEF_AREA = 1500
@@ -238,3 +239,8 @@ if __name__ == "__main__":
             
             aa = []
             bb = []
+    for file in os.listdir(path_to_in):
+        if file in df['data'].unique():
+            continue
+        print(path_to_in+file)
+#        shutil.rmtree(path_to_in+file, ignore_errors=True)  
