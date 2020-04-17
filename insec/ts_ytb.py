@@ -14,7 +14,7 @@ import glob
 from PIL import Image
 
 TIME_LIM = 600
-DEF_AREA = 1000
+DEF_AREA = 1500
 REFERER = ""
 
 
