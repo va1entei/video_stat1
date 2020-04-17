@@ -1,11 +1,10 @@
-name: all work in comment body
+name: work in crone
 on:
-  issue_comment:
-    types: [created]
+  schedule:
+    - cron:  '0 */3 * * *' 
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: contains(github.event.comment.body, 'sudo')        
     steps:
     - uses: actions/checkout@v1
       with:
@@ -27,4 +26,4 @@ jobs:
            sudo pip3 install imutils
            sudo pip3 install streamlink
            sudo pip3 install Pillow
-           ${{github.event.comment.body}} 
+           sudo python3 insec/ts_ytb.py /opt/ in/ https://www.youtube.com/watch?v=LKz1cXG-U2Y
