@@ -72,6 +72,8 @@ def detect_motion(file_name):
     num1rect = 0
     siz1rect = 0
     step_sv = 0
+    coun_save = 0
+    capms = 1
     vs = cv2.VideoCapture(file_name)
     firstFrame = None
     while True:
@@ -94,13 +96,13 @@ def detect_motion(file_name):
         for c in cnts:
             if cv2.contourArea(c) < DEF_AREA:
                 continue
-            if cv2.contourArea(c) <= siz1rect and step_sv == 5:
-                continue
-            siz1rect = cv2.contourArea(c)
+#            if cv2.contourArea(c) <= siz1rect and step_sv == 5:
+#                continue
+#            siz1rect = cv2.contourArea(c)
 
-            if len(cnts) <= num1rect and step_sv == 4:
-                continue
-            num1rect = len(cnts)
+#            if len(cnts) <= num1rect and step_sv == 4:
+#                continue
+#            num1rect = len(cnts)
             
             flg_save += 1
             (x, y, w, h) = cv2.boundingRect(c)
@@ -121,14 +123,25 @@ def detect_motion(file_name):
             if os.path.exists(filejpg):
                 os.remove(filejpg)           
             step_sv += 1
-            if step_sv > 5:
+            if step_sv > 2:
                 step_sv = 2
-
 
             cv2.imwrite(filejpg, frameOrig)
             
+            image1 = Image.open(folder1+"/"+file_name.split('.')[0]+"_0_.jpg")
+            image2 = Image.open(filejpg)
+            image1.putalpha(1)
+            image2.putalpha(1)
+#            alphaComposited = Image.alpha_composite(image1, image2)
+            alphaComposited = Image.blend(image1, image2,.1)
+            rgb_im = alphaComposited.convert('RGB')
+            rgb_im.save(folder1+"/"+file_name.split('.')[0]+"_0_.jpg")  
+
+        if capms != 0.0:
+            capms = vs.get(cv2.CAP_PROP_POS_MSEC)
+            
     vs.release()   
-    return siz1rect
+    return coun_save,capms            
     
 def getSegs(m3):
     lines = m3.text.split('\n')
@@ -171,14 +184,14 @@ if __name__ == "__main__":
     aa = []
     bb = []
     print("csv")
-    fieldnames = ['data', 'time_start','time_stop','count_move','screen']
+    fieldnames = ['data', 'time_start','time_stop','count_move','caps_num','screen']
     file_csv='insec/names.csv'
     if not os.path.exists(file_csv):
         with open(file_csv, 'w', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)    
             writer.writeheader()
             writer.writerow({'data': '20200101', 'time_start': '010101',
-                'time_stop':'010101','count_move':'0',
+                'time_stop':'010101','count_move':'0','caps_num':'0.0',
                 'screen':'none' })
     print("read csv")            
     df = pd.read_csv(file_csv)
@@ -209,13 +222,14 @@ if __name__ == "__main__":
 #            print(bb)
             file_video_name = value.strftime('%Y%m%d-%H%M%S')+value2.strftime('-%H%M%S')+".ts"
             dumpSegs( bb,file_video_name )
-            out = detect_motion(file_video_name)
+            out,caps_num = detect_motion(file_video_name)
 #            print(out)
 #pogoda 
             with open(file_csv, 'a', newline='') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 writer.writerow({'data': value.strftime('%Y%m%d'), 'time_start':  value.strftime('%H%M%S'),
                     'time_stop':value2.strftime('%H%M%S'),'count_move':out,
+                    'caps_num':caps_num,
                     'screen':'none' if out == 0 else file_video_name.split('.')[0]+".jpg"})
 
             if out != 0:
