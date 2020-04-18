@@ -127,10 +127,6 @@ def detect_motion(file_name):
 
             cv2.imwrite(filejpg, frameOrig)
             
-            image1 = Image.open(folder1+"/"+file_name.split('.')[0]+"_0_.jpg")
-            image2 = Image.open(filejpg)
-            alphaComposited = Image.alpha_composite(image3, image4)
-            alphaComposited.save(folder1+"/"+file_name.split('.')[0]+"_0_.jpg")
     vs.release()   
     return siz1rect
     
