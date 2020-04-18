@@ -191,7 +191,7 @@ if __name__ == "__main__":
     for i in segments:
         timeinurl += int(timeadd)
         valuetmp = datetime.datetime.fromtimestamp(timeinurl,tzloc)      
-        print(valuetmp.strftime('%Y%m%d-%H%M%S'))
+ #       print(valuetmp.strftime('%Y%m%d-%H%M%S'))
         if int(datanum) > int(valuetmp.strftime('%Y%m%d')):
             continue
         if int(datanum) == int(valuetmp.strftime('%Y%m%d')):
@@ -205,11 +205,11 @@ if __name__ == "__main__":
         value = datetime.datetime.fromtimestamp(aa[0],tzloc)
         value2 = datetime.datetime.fromtimestamp(aa[-1],tzloc)
         if aa[-1] - aa[0] > TIME_LIM or value.strftime('%Y%m%d') != value2.strftime('%Y%m%d'):        
-            print(bb)
+#            print(bb)
             file_video_name = value.strftime('%Y%m%d-%H%M%S')+value2.strftime('-%H%M%S')+".ts"
             dumpSegs( bb,file_video_name )
             out = detect_motion(file_video_name)
-            print(out)
+#            print(out)
 #pogoda 
             with open(file_csv, 'a', newline='') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -239,6 +239,7 @@ if __name__ == "__main__":
             
             aa = []
             bb = []
+    print(df['data'].unique())
     for file in os.listdir(path_to_in):
         if file in df['data'].unique():
             continue
