@@ -15,7 +15,7 @@ from PIL import Image
 import shutil
 
 TIME_LIM = 600
-DEF_AREA = 1500
+DEF_AREA = 500
 REFERER = ""
 
 
