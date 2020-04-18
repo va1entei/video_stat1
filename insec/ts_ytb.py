@@ -108,6 +108,7 @@ def detect_motion(file_name):
             (x, y, w, h) = cv2.boundingRect(c)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         if flg_save > 0:
+            coun_save += 1
             flg_save = 0
             frameOrig = frame.copy()
             
