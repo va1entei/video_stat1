@@ -255,7 +255,8 @@ if __name__ == "__main__":
             
             aa = []
             bb = []
-    st1 = print(df['data'].unique())
+    st1 = df['data'].unique()
+    print(st1)
     for file in os.listdir(path_to_in):
         if file in str(st1):
             continue
