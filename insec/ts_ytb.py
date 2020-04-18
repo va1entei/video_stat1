@@ -254,9 +254,9 @@ if __name__ == "__main__":
             
             aa = []
             bb = []
-    print(df['data'].unique())
+    st1 = print(df['data'].unique())
     for file in os.listdir(path_to_in):
-        if file in df['data'].unique():
+        if file in str(st1):
             continue
         print(path_to_in+file)
 #        shutil.rmtree(path_to_in+file, ignore_errors=True)  
