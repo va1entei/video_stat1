@@ -261,4 +261,4 @@ if __name__ == "__main__":
         if file in str(st1):
             continue
         print(path_to_in+file)
-#        shutil.rmtree(path_to_in+file, ignore_errors=True)  
+        shutil.rmtree(path_to_in+file, ignore_errors=True)  
