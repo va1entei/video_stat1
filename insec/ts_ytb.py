@@ -11,11 +11,11 @@ import csv
 import pytz
 import streamlink
 import glob
-from PIL import Image
+from PIL import Image ,ImageDraw
 import shutil
 
-TIME_LIM = 600
-DEF_AREA = 500
+TIME_LIM = 1800
+DEF_AREA = 100
 REFERER = ""
 
 
@@ -81,8 +81,10 @@ def detect_motion(file_name):
         frame = frame[1]
         text = "Unoccupied"
         if frame is None:
-            break                
+            break       
+        #(wa, ha,c) =  frame.shape              
         frame = imutils.resize(frame, width=500)
+        (ha, wa,c) =  frame.shape       
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (21, 21), 0)
         if firstFrame is None:
@@ -93,16 +95,25 @@ def detect_motion(file_name):
         thresh = cv2.dilate(thresh, None, iterations=2)
         cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         cnts = imutils.grab_contours(cnts)
+        siz1rectloc = 0
         for c in cnts:
             if cv2.contourArea(c) < DEF_AREA:
                 continue
-#            if cv2.contourArea(c) <= siz1rect and step_sv == 5:
-#                continue
-#            siz1rect = cv2.contourArea(c)
-
-#            if len(cnts) <= num1rect and step_sv == 4:
-#                continue
-#            num1rect = len(cnts)
+            if cv2.contourArea(c) > siz1rect:
+                siz1rect = cv2.contourArea(c)		
+            if cv2.contourArea(c) > siz1rectloc:
+                siz1rectloc = cv2.contourArea(c)
+                (x1,y1,w1,h1) = cv2.boundingRect(c)
+                if wa/w1 < 5:
+                    w1=w1/5
+                if ha/h1 < 5:
+                    h1=h1/5
+                transparent_area1 = (0,0,wa,y1)
+                transparent_area2 = (0, y1 + h1,wa,ha)
+                transparent_area3 = (0,y1, x1,y1 + h1)
+                transparent_area4 = (x1+w1,y1, wa,y1 + h1)                
+            if len(cnts) > num1rect:
+                num1rect = len(cnts)
             
             flg_save += 1
             (x, y, w, h) = cv2.boundingRect(c)
@@ -116,33 +127,40 @@ def detect_motion(file_name):
             if not os.path.exists(folder1):
                 os.mkdir(folder1)
             
-            folder1 = folder1+"/"+file_name.split('-')[1]+"-"+file_name.split('-')[2].split('.')[0]
-            if not os.path.exists(folder1):
-                os.mkdir(folder1)
+#            folder1 = folder1+"/"+file_name.split('-')[1]+"-"+file_name.split('-')[2].split('.')[0]
+#            if not os.path.exists(folder1):
+#                os.mkdir(folder1)
   
             filejpg=folder1+"/"+file_name.split('.')[0]+"_"+str(step_sv)+"_.jpg"
             if os.path.exists(filejpg):
                 os.remove(filejpg)           
-            step_sv += 1
-            if step_sv > 2:
-                step_sv = 2
-
+            
             cv2.imwrite(filejpg, frameOrig)
             
             image1 = Image.open(folder1+"/"+file_name.split('.')[0]+"_0_.jpg")
             image2 = Image.open(filejpg)
             image1.putalpha(1)
             image2.putalpha(1)
-#            alphaComposited = Image.alpha_composite(image1, image2)
-            alphaComposited = Image.blend(image1, image2,.1)
+            mask=Image.new('L', image2.size, color=255)
+            draw=ImageDraw.Draw(mask) 
+            draw.rectangle(transparent_area1, fill=0)
+            draw.rectangle(transparent_area2, fill=0)
+            draw.rectangle(transparent_area3, fill=0)
+            draw.rectangle(transparent_area4, fill=0)
+            image2.putalpha(mask)
+            alphaComposited = Image.alpha_composite(image1, image2)
             rgb_im = alphaComposited.convert('RGB')
             rgb_im.save(folder1+"/"+file_name.split('.')[0]+"_0_.jpg")  
+            if step_sv == 0:
+                step_sv = 1
+            elif os.path.exists(filejpg):
+                os.remove(filejpg)  
 
         if capms != 0.0:
             capms = vs.get(cv2.CAP_PROP_POS_MSEC)
             
     vs.release()   
-    return coun_save,capms            
+    return coun_save,capms,siz1rect,num1rect            
     
 def getSegs(m3):
     lines = m3.text.split('\n')
@@ -185,7 +203,7 @@ if __name__ == "__main__":
     aa = []
     bb = []
     print("csv")
-    fieldnames = ['data', 'time_start','time_stop','count_move','caps_num','screen']
+    fieldnames = ['data', 'time_start','time_stop','count_move','caps_num','size_rect','count_rect','screen']
     file_csv='insec/names.csv'
     if not os.path.exists(file_csv):
         with open(file_csv, 'w', newline='') as csvfile:
@@ -193,7 +211,7 @@ if __name__ == "__main__":
             writer.writeheader()
             writer.writerow({'data': '20200101', 'time_start': '010101',
                 'time_stop':'010101','count_move':'0','caps_num':'0.0',
-                'screen':'none' })
+                'size_rect':'0','count_rect':'0','screen':'none' })
     print("read csv")            
     df = pd.read_csv(file_csv)
     datanow = df['data'].tolist()
@@ -223,44 +241,40 @@ if __name__ == "__main__":
 #            print(bb)
             file_video_name = value.strftime('%Y%m%d-%H%M%S')+value2.strftime('-%H%M%S')+".ts"
             dumpSegs( bb,file_video_name )
-            out,caps_num = detect_motion(file_video_name)
+            out,caps_num,sizrect,numrect = detect_motion(file_video_name)
 #            print(out)
 #pogoda 
             with open(file_csv, 'a', newline='') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 writer.writerow({'data': value.strftime('%Y%m%d'), 'time_start':  value.strftime('%H%M%S'),
                     'time_stop':value2.strftime('%H%M%S'),'count_move':out,
-                    'caps_num':caps_num,
+                    'caps_num':caps_num,'size_rect':sizrect,'count_rect':numrect,
                     'screen':'none' if out == 0 else file_video_name.split('.')[0]+".jpg"})
 
             if out != 0:
-                folder1 = path_to_in+file_video_name.split('-')[0]
-                folder1 = folder1+"/"+file_video_name.split('-')[1]+"-"+file_video_name.split('-')[2].split('.')[0]
-                fp_in = folder1+"/"+"*.jpg"
-                fp_out = folder1+"/"+file_video_name.split('.')[0]+".gif"
-                img, *imgs = [Image.open(f) for f in sorted(glob.glob(fp_in))]
-                img.save(fp=fp_out, format='GIF', append_images=imgs,
-                        save_all=True, duration=200, loop=0)
-#                os.system("rm -rf "+folder1+"/"+"*.jpg")
-                
+                with open("README.md", 'a', newline='') as filemd:
+#                ![20202020 1](in/20200426/000008-001013/20200426-000008-001013_0_.jpg)
+#                    path_to_in+file_name.split('-')[0]+"/"+file_video_name.split('.')[0]+".jpg"
+                    writerow1 = "!["+file_video_name.split('.')[0]+"]("+path_to_in+file_video_name.split('-')[0]+"/"+file_video_name.split('.')[0]+"_0_.jpg)\n"    
+                    filemd.write(writerow1)
             os.remove(file_video_name)
 
             os.system("git config --global user.name \""+logi_name+"\"")
             os.system("git config --global user.email "+logi_name+"@github.com")
             os.system("git remote set-url origin https://"+logi_name+":"+pass_name+"@github.com/"+logi_name+"/"+retpo_name+".git")
             os.system("git checkout master")
-            os.system("git add  insec "+path_to_in)
+            os.system("git add  insec "+path_to_in+" README.md")
             os.system("git commit -m \"oinion csv files\"")
             os.system("git push origin master   ") 	
             
             aa = []
             bb = []
+            
+    df = pd.read_csv(file_csv)        
     st1 = df['data'].unique()
-    print(st1)
     for file in os.listdir(path_to_in):
         if file in str(st1):
             continue
-        print(path_to_in+file)
         shutil.rmtree(path_to_in+file, ignore_errors=True)  
     os.system("git config --global user.name \""+logi_name+"\"")
     os.system("git config --global user.email "+logi_name+"@github.com")
