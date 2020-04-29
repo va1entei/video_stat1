@@ -15,7 +15,7 @@ from PIL import Image ,ImageDraw
 import shutil
 
 TIME_LIM = 1800
-DEF_AREA = 100
+DEF_AREA = 300
 REFERER = ""
 
 
