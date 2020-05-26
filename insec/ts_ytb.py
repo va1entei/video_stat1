@@ -198,13 +198,13 @@ if __name__ == "__main__":
     timeadd = m3u8.text.split('EXT-X-TARGETDURATION:')[1].split('\n#')[0]        
     date = datetime.datetime.strptime(datime, "%Y-%m-%dT%H:%M:%S")
     timestamp = datetime.datetime.timestamp(date)
-    if os.path.exists("Readme.md"):
-        if not os.path.exists(now1.strftime('%Y%m%d')+".md"):
-            os.rename("Readme.md", now1.strftime('%Y%m%d')+".md")
-
     aa = []
     bb = []
     print("csv")
+    now1 = datetime.datetime.now()
+    if os.path.exists("Readme.md"):
+        if not os.path.exists(now1.strftime('%Y%m%d')+".md"):
+            os.rename("Readme.md", now1.strftime('%Y%m%d')+".md")
     fieldnames = ['data', 'time_start','time_stop','count_move','caps_num','size_rect','count_rect','screen']
     file_csv='insec/names.csv'
     if not os.path.exists(file_csv):
