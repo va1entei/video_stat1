@@ -198,7 +198,9 @@ if __name__ == "__main__":
     timeadd = m3u8.text.split('EXT-X-TARGETDURATION:')[1].split('\n#')[0]        
     date = datetime.datetime.strptime(datime, "%Y-%m-%dT%H:%M:%S")
     timestamp = datetime.datetime.timestamp(date)
-
+    if os.path.exists("Readme.md"):
+        if not os.path.exists(now1.strftime('%Y%m%d')+".md"):
+            os.rename("Readme.md", now1.strftime('%Y%m%d')+".md")
 
     aa = []
     bb = []
@@ -263,7 +265,7 @@ if __name__ == "__main__":
             os.system("git config --global user.email "+logi_name+"@github.com")
             os.system("git remote set-url origin https://"+logi_name+":"+pass_name+"@github.com/"+logi_name+"/"+retpo_name+".git")
             os.system("git checkout master")
-            os.system("git add  insec "+path_to_in+" README.md")
+            os.system("git add  insec "+path_to_in+" *.md")
             os.system("git commit -m \"oinion csv files\"")
             os.system("git push origin master   ") 	
             
